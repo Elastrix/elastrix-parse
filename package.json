@@ -1,0 +1,15 @@
+{
+  "name": "elastrix-parse",
+  "version": "1.0.0",
+  "description": "Elastrix Parse Server",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "author": "Elastrix.io",
+  "license": "GPL-3.0",
+  "dependencies": {
+    "express": "^4.13.4"
+  }
+}
