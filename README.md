@@ -12,14 +12,14 @@ Coupled with the elastrix cli on the Elastrix Parse EC2 app it is a powerful, fa
 
 The server is run as a deamon and monitored via the Linux system with Monit.
 
-##### Interacting with the Service
+#### Interacting with the Service
 On the Elastrix Parse Server, you can interact with the service via Ubuntu Upstart:
 
     $ sudo service parse start|stop|restart|status
 
  The configuration is mostly done with environment variables that are managed and configurable via the Elastrix CLI.
 
- ##### Debugging
+ #### Debugging
  To view the server output:
 
      $ tail /var/log/parse-upstart.log -f
