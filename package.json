@@ -10,6 +10,8 @@
   "author": "Elastrix.io",
   "license": "GPL-3.0",
   "dependencies": {
-    "express": "^4.13.4"
+    "express": "^4.13.4",
+    "parse-dashboard": "^1.0.11",
+    "parse-server": "^2.2.10"
   }
 }
