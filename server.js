@@ -38,6 +38,17 @@ var port = process.env.port || 1337,
     mongoURL = databaseUri,
     cloud = process.env.CLOUD_CODE_MAIN || __dirname + '/cloud/main.js',
     allowInsecureHTTP = process.env.ALLOW_INSECURE_HTTP || 0;  
+
+/**
+ * This is the basic authentication for the parse dashboard
+ * You should update these after you launch your server.
+ */
+var dashboardUsers = [
+        {
+            user: "elastrix",
+            pass: "elastrix"
+	}
+];
 /**
  * The API server just uses the values from above,
  * you shouldn't need to modify this
@@ -72,12 +83,7 @@ var dashboard = new ParseDashboard({
 	  production: true
 	}
     ],
-    users: [
-	{
-	    user: "elastrix",
-	    pass: "elastrix"
-	}
-    ] 
+    users: dashboardUsers
 });
 
 app.use('/parse', api);
