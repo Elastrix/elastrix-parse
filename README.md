@@ -19,7 +19,7 @@ On the Elastrix Parse Server, you can interact with the service via Ubuntu Upsta
 
  The configuration is mostly done with environment variables that are managed and configurable via the Elastrix CLI.
 
- #### Debugging
+#### Debugging and Logging
  To view the server output:
 
      $ tail /var/log/parse-upstart.log -f
