@@ -1,11 +1,27 @@
 /**
  * The Elastrix Parse Server
  * Copyright 2016 Elastrix, all rights reserved
+ * 
+ * This application is configured to run on the Elastrix Parse Server
+ * on AWS. You can launch the instance via the AWS Marketplace. 
+ * See https://elastrix.io/parse for details and documentation.
+ *
+ * @author Elastrix <info@elastrix.io>
+ * @copyright 2016
  **/
+
 require('shelljs/global');
-var instanceId = exec('ec2metadata --instance-id',{silent:true}).stdout;
-var ip = exec('ec2metadata --public-ipv4',{silent:true}).stdout;
-var host = exec('ec2metadata --public-hostname',{silent:true}).stdout;
+
+/**
+ * Detecting Ec2 values based on instance metadata. The IP and HOST
+ * are used for SSL configuration, you can change these if you update
+ * to a custom domain name or elastic IP
+ */
+var instanceId = exec('ec2metadata --instance-id',{silent:true}).stdout,
+    ip = exec('ec2metadata --public-ipv4',{silent:true}).stdout,
+    host = exec('ec2metadata --public-hostname',{silent:true}).stdout;
+
+/** System Requirements **/
 var express = require('express'),
     path = require('path'),
     fs = require('fs'),
@@ -17,10 +33,16 @@ var express = require('express'),
     caCertsPath = path.join(__dirname, 'certs', 'ca');
 
 
-var databaseUri = process.env.DATABASE_URI || process.env.MONGODB_URI;
+/** Database configuration **/
+var databaseUri = process.env.PARSE_DATABASE_URI || process.env.PARSE_MONGODB_URI;
 
+/**
+ * If a database environment variable is not set, we will use the local
+ * mongodb database. If you are not using the local mongodb, you can 
+ * sudo apt-get remove mongodb-org 
+ */
 if (!databaseUri) {
-    console.log('DATABASE_URI not specified, falling back to localhost.');
+    console.log('PARSE_DATABASE_URI not specified, using local mongodb.');
     databaseUri = "mongodb://localhost:27017/dev";
 }
 
@@ -29,15 +51,16 @@ if (!databaseUri) {
  * then run sudo service parse restart on your
  * elastrix parse server
  */
-var port = process.env.port || 1337,
-    appId = process.env.APP_ID || 'elastrix',
-    appName = process.env.APP_NAME || 'elastrix',
-    masterKey = process.env.MASTER_KEY || 'elastrix',
-    fileKey = process.env.FILE_KEY || '',
-    serverURL = process.env.SERVER_URL || 'https://'+ip+':'+port+'/parse',
+var port = process.env.PARSE_PORT || 1337,
+    appId = process.env.PARSE_APP_ID || 'elastrix',
+    appName = process.env.PARSE_APP_NAME || 'elastrix',
+    masterKey = process.env.PARSE_MASTER_KEY || 'elastrix',
+    fileKey = process.env.PARSE_FILE_KEY || '',
+    serverURL = process.env.PARSE_SERVER_URL || 'https://'+ip+':'+port+'/parse',
     mongoURL = databaseUri,
-    cloud = process.env.CLOUD_CODE_MAIN || __dirname + '/cloud/main.js',
-    allowInsecureHTTP = process.env.ALLOW_INSECURE_HTTP || 0;  
+    cloud = process.env.PARSE_CLOUD_CODE_MAIN || __dirname + '/cloud/main.js',
+    allowInsecureHTTP = process.env.PARSE_ALLOW_INSECURE_HTTP || 0,
+    appProduction = process.env.PARSE_APP_PRODUCTION || true;  
 
 /**
  * This is the basic authentication for the parse dashboard
@@ -45,10 +68,16 @@ var port = process.env.port || 1337,
  */
 var dashboardUsers = [
         {
-            user: "elastrix",
-            pass: "elastrix"
+            user: process.env.PARSE_DASH_USER || "elastrix",
+            pass: process.env.PARSE_DASH_PASS || "elastrix"
 	}
 ];
+
+/**
+ * List of classes to support for query subscriptions
+ */
+var liveQueryClassNames = [ "Posts", "Comments" ];
+
 /**
  * The API server just uses the values from above,
  * you shouldn't need to modify this
@@ -61,7 +90,7 @@ var api = new ParseServer({
     fileKey: fileKey,
     serverURL: serverURL,
     liveQuery: {
-        classNames: ["Posts", "Comments"] // List of classes to support for query subscriptions
+        classNames: liveQueryClassNames
     }
 });
 // Client-keys like the javascript key or the .NET key are not necessary with parse-server
@@ -80,7 +109,7 @@ var dashboard = new ParseDashboard({
 	  appId: appId,
 	  masterKey: masterKey,
 	  appName: appName,
-	  production: true
+	  production: appProduction
 	}
     ],
     users: dashboardUsers
@@ -98,6 +127,11 @@ app.get('/elx', function(req, res) {
   res.status(200).send('Elastrix Parse Server');
 });
 
+/** 
+ * Node.js's HTTPS configuration. This will use the detected
+ * public hostname by default, usually ec2-x-x-x-x.amazonaws.etc
+ */
+
 options = {
   hostname: host,
   key: fs.readFileSync(path.join(certsPath, 'my-server.key.pem'))
@@ -110,10 +144,12 @@ options = {
 , rejectUnauthorized: true
 };
 
+/** Run the HTTPS Server **/
 var httpServer = require('https').createServer(options,app);
     httpServer.listen(port, function() {
-	console.log('elastrix-parse running on port ' + port + ' for instance-id: ' + instanceId + '.');
-    	console.log('elastrix-parse appId: ' + appId + '.');
+	    console.log('elastrix-parse running on port ' + port + ' for instance-id: ' + instanceId + '.');
+        console.log('elastrix-parse appId: ' + appId + '.');
     });
 
+/** Configure Parse to use LiveQuery **/
 ParseServer.createLiveQueryServer(httpServer);
