@@ -1,4 +1,5 @@
 <!DOCTYPE HTML>
+
 <!--
 	Strata by HTML5 UP
 	html5up.net | @n33co
@@ -25,9 +26,9 @@
 						<img src="http://elastrix.io/content/images/2015/09/elastrix-logo-white.png" style="width:98%;"/>
 					</a>
 					</h1>
-				<h1><strong>Red5 Media Server</strong><br />
-				Ubuntu 14.04, Java 7, Red5 1.0.6<br/><br />
-				crafted by <a href="http://elastrix.io" target="_blank">Elastrix</a>.</h1>
+				<h1><strong>Parse Server</strong><br />
+				Ubuntu 14.04, Node.js 4.4.4, Monit<br/>
+				hand crafted by <a href="http://elastrix.io" target="_blank">Elastrix</a>.</h1>
 			</header>
 
 		<!-- Main -->
@@ -39,27 +40,15 @@
 							<h2>Congratulations! Your App is ready to go!</h2>
 						</header>
 						<p>
-<video id="my_video_1" class="video-js vjs-default-skin" controls autoplay preload="auto" width="640" height="268"
-  data-setup='{}'>
-    <source src="rtmp://${pageContext.request.getServerName()}/vod/big_buck_bunny.mp4" type='rtmp/mp4'>
-  </video>
-
-  <script>
-  </script>
-Our battle tested, scablable and performance tweaked Red5 Media Server is perfect for gaming development or streaming media delivery.
-						It features Ubuntu 14.04, Java 1.7, and embedded tomcat setup for easy access to Red5 web interface via port 5080. The above video is H264 encoded and streaming via RTMP via your new Red5 Media Server using video.js.</p>
-						<ol>
-							<li>Login via ssh with the key you used to start your instance and username 'ubuntu' i.e. 
-							<br/><code>ssh -i mykey.pem ubuntu@${pageContext.request.getServerName()}</code>
-							</li>
-							<li>Interact with the Red5 upstart service:<br/><code>sudo service red5 status|start|stop</code>
-							<br/>This will work directly with the red5 service.</li>
-						</ol>
+The Elastrix Parse server is a full featured, production ready Parse Server. It utilizes the Open Source Parse Server and Dashboard and provides an always up configuration with server monitoring. The Parse Server is run as an Ubuntu Upstart service and monitored for stability. You can access the monitoring dashboard at the Monit link below. From there you can start/stop/restart services without ever needing to login to the command line. This keeps your server secure since you don't need to open up SSH at all. Webmin is also included (link below) for server administration.
+</p>
 						<ul class="actions">
-							<li><a href="mailto:support@elastrix.io?subject=Red5 Support Request" target="_blank" class="button">Get Support</a></li>
-							<li><a href="https://github.com/Red5/red5-server/wiki/General-How-to" target="_blank" class="button">Red5 Wiki</a></li>
-							<li><a href="http://${pageContext.request.getServerName()}:5080" target="_blank" class="button">Red5 Root</a></li>
+							<li><a href="https://elastrix.io/parse" target="_blank" class="button">Docs</a></li>
+							<li><a href="/dashboard" class="button">Parse Dashboard</a></li>
+							<li><a onclick="location.href='http://'+window.location.hostname + ':2812'" href="javascript:void(null)" class="button">Monit</a></li>
+							<li><a onclick="location.href='https://'+window.location.hostname + ':10000'" href="javascript:void(null)" class="button">Webmin</a></li>
 						</ul>
+						<p>Please note, when using self signed certificates (like this app does out-of-the-box), you'll receive an SSL error, just click "proceed anyway" or add an exception in firefox to continue.
 					</section>
 
 					<section id="two">
