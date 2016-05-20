@@ -110,10 +110,20 @@ options = {
 , rejectUnauthorized: true
 };
 
-var httpServer = require('https').createServer(options,app);
-    httpServer.listen(port, function() {
-	console.log('elastrix-parse running on port ' + port + ' for instance-id: ' + instanceId + '.');
-    	console.log('elastrix-parse appId: ' + appId + '.');
-    });
+/**
+ * Serving HTTPS for dashboard (required) and secure application server
+ */
+var httpsServer = require('https').createServer(options,app).listen(port, function() {
+    console.log('elastrix-parse Dashboard availble at https://' + ip + ':' + port + '/dashboard');
+    console.log('elastrix-parse App available at https://' + ip + ':' + port + '/parse');
+});
 
-ParseServer.createLiveQueryServer(httpServer);
+/**
+ * Also serving an HTTP server for non-ssl connections
+ * the dashboard will not work over https unless you set
+ * the allowUnsecureHttp flag in dashboard options i.e. if
+ * you want to terminate SSL on a load balancer
+ */
+var httpServer = require('http').createServer(app).listen(port);
+
+ParseServer.createLiveQueryServer(httpsServer);
