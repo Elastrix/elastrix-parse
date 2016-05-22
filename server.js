@@ -59,12 +59,8 @@ var port = process.env.PARSE_PORT || 443,
     mongoURL = databaseUri,
     cloud = process.env.PARSE_CLOUD_CODE_MAIN || __dirname + '/cloud/main.js',
     allowInsecureHTTP = process.env.PARSE_ALLOW_INSECURE_HTTP || 0,
-    serverURL = process.env.PARSE_SERVER_URL || 'https://'+ip+':'+port+'/parse',
+    serverURL = process.env.PARSE_SERVER_URL || 'https://'+host+'/parse',
     appProduction = process.env.PARSE_APP_PRODUCTION || true; 
-
-if (allowInsecureHTTP === 1) {
-    serverURL = process.env.PARSE_SERVER_URL || 'http://'+ip+':'+port+'/parse'
-}
 
 /**
  * This is the basic authentication for the parse dashboard
@@ -176,9 +172,9 @@ options = {
  * Serving HTTPS for dashboard (required) and secure application server
  */ 
 var httpsServer = require('https').createServer(options,app).listen(port, function() {
-    console.log('elastrix-parse Dashboard availble:');
-    console.log('https://' + ip + '/dashboard');
-    console.log('elastrix-parse App available:');
+    console.log('Parse Dashboard:');
+    console.log('https://' + host + '/dashboard');
+    console.log('Parse Server:');
     console.log(serverURL);
 });
 
