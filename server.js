@@ -56,11 +56,15 @@ var port = process.env.PARSE_PORT || 443,
     appName = process.env.PARSE_APP_NAME || 'elastrix',
     masterKey = process.env.PARSE_MASTER_KEY || 'elastrix',
     fileKey = process.env.PARSE_FILE_KEY || '',
-    serverURL = process.env.PARSE_SERVER_URL || 'https://'+ip+':'+port+'/parse',
     mongoURL = databaseUri,
     cloud = process.env.PARSE_CLOUD_CODE_MAIN || __dirname + '/cloud/main.js',
     allowInsecureHTTP = process.env.PARSE_ALLOW_INSECURE_HTTP || 0,
-    appProduction = process.env.PARSE_APP_PRODUCTION || true;  
+    serverURL = process.env.PARSE_SERVER_URL || 'https://'+ip+':'+port+'/parse',
+    appProduction = process.env.PARSE_APP_PRODUCTION || true; 
+
+if (allowInsecureHTTP === 1) {
+    serverURL = process.env.PARSE_SERVER_URL || 'http://'+ip+':'+port+'/parse'
+}
 
 /**
  * This is the basic authentication for the parse dashboard
@@ -112,7 +116,8 @@ var dashboard = new ParseDashboard({
 	  production: appProduction
 	}
     ],
-    users: dashboardUsers
+    users: dashboardUsers,
+    allowInsecureHTTP: allowInsecureHTTP
 });
 
 /** standard parse endpoints **/
@@ -125,16 +130,18 @@ app.use('/dashboard',dashboard);
  * to terminate SSL there instead, remove this and 
  * the function below
  */
-app.enable('trust proxy');
-app.use(function(req,res,next) {
-    if (req.secure) {
-	// request was via https
-	next();
-    } else {
-	// request was via http, redirect
-	res.redirect('https://' + req.headers.host + req.url);
-    }    
-});
+if (allowInsecureHTTP === 0) {
+    app.enable('trust proxy');
+    app.use(function(req,res,next) {
+        if (req.secure) {
+    	// request was via https
+    	next();
+        } else {
+    	// request was via http, redirect
+    	res.redirect('https://' + req.headers.host + req.url);
+        }    
+    });
+}
 
 /** public static assets **/
 app.use('/', express.static(__dirname + '/public'));
@@ -172,7 +179,7 @@ var httpsServer = require('https').createServer(options,app).listen(port, functi
     console.log('elastrix-parse Dashboard availble:');
     console.log('https://' + ip + '/dashboard');
     console.log('elastrix-parse App available:');
-    console.log('https://' + ip + '/parse');
+    console.log(serverURL);
 });
 
 var httpServer = require('http').createServer(app).listen(80);
